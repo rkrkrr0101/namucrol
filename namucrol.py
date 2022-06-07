@@ -52,18 +52,9 @@ driver.find_element(by=By.XPATH,value='/html/body').send_keys(Keys.TAB)
 #driver.send_keys(Keys.TAB)
 #대기5초
 driver.implicitly_wait(time_to_wait=5)
-#값받아오기
-ta=driver.find_element(by=By.XPATH,value='/html/body/div/div/div[1]/nav/form/div/div/div')
-#결과값자르기
-res=ta.text.split('\n')
-#드라이버닫기
-driver.close()
 
+ht=driver.page_source
 
-# In[2]:
-
-
-#디비연결
 db = pymysql.connect(
     user=os.environ.get('db_user') , 
     passwd=os.environ.get('db_pw'), 
@@ -87,78 +78,7 @@ cursor = db.cursor(pymysql.cursors.DictCursor)
 #검색결과삽입
 sql="""insert into  namu_log 
 (na_one,na_two,na_three,na_four,na_five,na_six,na_seven,na_eight,na_nine,na_ten)
-values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+values(%s,"1","1","1","1","1","1","1","1","1")
 """
-cursor.execute(sql,res)
+cursor.execute(sql,ht)
 db.commit()
-
-
-# In[15]:
-
-
-#한달치 데이터 긁어오기
-sql="""select * from namu_log
-order by na_time DESC LIMIT 8640
-"""
-cursor.execute(sql)
-logres=cursor.fetchall()
-
-
-# In[21]:
-
-
-#현재 캐시데이터 삭제
-sql="""delete from namu_data"""
-cursor.execute(sql)
-db.commit()
-
-
-# In[27]:
-
-
-# i+1 12,288,2016,8640
-#사전작업
-logdic={}
-sql="""insert into  namu_data 
-(nd_one,nd_two,nd_three,nd_four,nd_five,nd_six,nd_seven,nd_eight,nd_nine,nd_ten,nd_kind)
-values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-"""
-#count=[3,4,5,12]
-#여기적힌거갯수일때 작동
-count=[12,288,2016,8640]
-countkind=['hour','day','week','month']
-
-#1시간 하루 이렇게 갯수세서 캐시에 넣기
-for logindex,logdata in enumerate (logres):
-    
-    for countindex,itemdata in enumerate(logdata.items()):
-        if (itemdata[0]== 'na_time' or itemdata[0]=='id'):
-            continue
-#        print(countindex,itemdata[0])
-        try:
-            logdic[itemdata[1]]+=11-countindex
-        except:
-            logdic[itemdata[1]]=11-countindex
-    if logindex+1 in count:
-        sortdic=sorted(logdic.items(),key=lambda x:x[1],reverse=True)
-        logdatares=[]
-        for i in sortdic[:10]:           
-            logdatares+=[i[0]]
-        logdatares+=[countkind[count.index(logindex+1) ]]
-
-        cursor.execute(sql,logdatares)
-        db.commit()
-     
-
-
-# In[24]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
