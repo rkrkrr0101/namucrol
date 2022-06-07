@@ -8,7 +8,4 @@ spec:
     image: gcr.io/second-form-351817/namucrol
     envFrom:
     - configMapRef:
-      name: dbconfig
-               
-            
-    restartPolicy: OnFailure
+      name: dbconfig         
