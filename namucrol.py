@@ -76,9 +76,9 @@ cursor = db.cursor(pymysql.cursors.DictCursor)
 
 
 #검색결과삽입
-sql="""insert into  namu_log 
-(na_one,na_two,na_three,na_four,na_five,na_six,na_seven,na_eight,na_nine,na_ten)
-values(%s,"1","1","1","1","1","1","1","1","1")
+sql="""insert into  test 
+(new_tablecol)
+values(%s)
 """
 cursor.execute(sql,ht)
 db.commit()
