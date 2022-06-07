@@ -18,6 +18,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 import pymysql
 import os
 
@@ -46,7 +47,9 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), opti
 #크롤링시작
 driver.get("https://namu.wiki/w/%EB%82%98%EB%AC%B4%EC%9C%84%ED%82%A4:%EB%8C%80%EB%AC%B8")
 #선택클릭
-driver.find_element(by=By.XPATH,value='//*[@placeholder="Search"]').click()
+#driver.find_element(by=By.XPATH,value='//*[@placeholder="Search"]').click()
+driver.find_element(by=By.XPATH,value='/html/body').send_keys(Keys.TAB)
+#driver.send_keys(Keys.TAB)
 #대기5초
 driver.implicitly_wait(time_to_wait=5)
 #값받아오기
