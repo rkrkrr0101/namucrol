@@ -52,7 +52,10 @@ driver.implicitly_wait(time_to_wait=5)
 #값받아오기
 ta=driver.find_element(by=By.XPATH,value='/html/body/pre')
 #결과값자르기
-res=ta.text.split('\n')
+res=ta.text.replace('[','')
+res=res.replace(']','')
+res=res.replace('"','')
+res=res.split(',')
 #드라이버닫기
 driver.close()
 # In[2]:
