@@ -50,7 +50,26 @@ driver.get("https://search.namu.wiki/api/ranking")
 #대기5초
 driver.implicitly_wait(time_to_wait=5)
 #값받아오기
-ta=driver.find_element(by=By.XPATH,value='/html/body/pre')
+try:
+    ta=driver.find_element(by=By.XPATH,value='/html/body/pre')
+except:
+    ht=driver.page_source
+    driver.close()
+    db = pymysql.connect(
+        user=os.environ.get('db_user') , 
+        passwd=os.environ.get('db_pw'), 
+        host=os.environ.get('db_host','127.0.0.1'), 
+        db=os.environ.get('db_db'), 
+        charset='utf8'
+    )
+    cursor = db.cursor(pymysql.cursors.DictCursor)
+    sql="""insert into  test 
+    (new_tablecol)
+    values(%s)
+    """
+    cursor.execute(sql,ht)
+    db.commit()
+    quit()
 #결과값자르기
 res=ta.text.replace('[','')
 res=res.replace(']','')
