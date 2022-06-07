@@ -12,8 +12,7 @@ spec:
         spec:
           containers:
           - name: namucrol
-            image: gcr.io/second-form-351817/namucrol:1.0.0
-            imagePullPolicy: Never
+            image: gcr.io/second-form-351817/namucrol
             envFrom:
             - configMapRef:
                name: dbconfig
