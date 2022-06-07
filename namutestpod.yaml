@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: namucrol
+    image: gcr.io/second-form-351817/namucrol
+    envFrom:
+    - configMapRef:
+      name: dbconfig
+               
+            
+    restartPolicy: OnFailure
