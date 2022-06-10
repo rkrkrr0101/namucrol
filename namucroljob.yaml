@@ -5,7 +5,7 @@ metadata:
   labels:
     type: crol
 spec:
-  schedule: "*/10 * * * *"
+  schedule: "*/30 * * * *"
   jobTemplate:
     spec:
       template:
