@@ -115,7 +115,7 @@ db.commit()
 
 #한달치 데이터 긁어오기
 sql="""select * from namu_log
-order by na_time DESC LIMIT 2160
+order by na_time DESC LIMIT 1440
 """
 cursor.execute(sql)
 logres=cursor.fetchall()
@@ -142,7 +142,8 @@ values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
 """
 #count=[3,4,5,12]
 #여기적힌거갯수일때 작동
-count=[3,72,504,2160]
+#count=[3,72,504,2160]  #시간당 3개
+count=[2,48,336,1440]  #시간당 2개
 countkind=['hour','day','week','month']
 
 #1시간 하루 이렇게 갯수세서 캐시에 넣기
