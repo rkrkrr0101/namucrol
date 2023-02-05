@@ -12,6 +12,8 @@ RUN apt-get -y install ./google-chrome-stable_current_amd64.deb
 RUN pip install pymysql
 RUN pip install selenium
 RUN pip install webdriver-manager
+RUN pip install python-dotenv
+RUN pip install cryptography
 
 COPY . ./app
 CMD [ "python", "app/namucrol.py" ]
