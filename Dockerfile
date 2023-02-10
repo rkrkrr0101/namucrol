@@ -16,4 +16,4 @@ RUN pip install python-dotenv
 RUN pip install cryptography
 
 COPY . ./app
-CMD [ "python", "app/namucrol.py" ]
+CMD [ "python", "app/main.py" ]
