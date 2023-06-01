@@ -18,59 +18,80 @@ def selectLog(db, cursor):
     order by na_time DESC LIMIT 1440
     """
     cursor.execute(sql)
-    logres = cursor.fetchall()
-    return logres
+    logRes = cursor.fetchall()
+    return logRes
 
 
-#todo:cc의존성 제거(주입시키자)
-def rerollNamuData(db, cursor, logres):
-    # 나무데이터 리셋
+def deleteData(db, cursor):
     sql = """delete from namu_data"""
     cursor.execute(sql)
 
-    logdic = {}
+# todo:cc의존성 제거(주입시키자),for문 함수로 빼내기,테스트생성
+# 그냥 리롤나무데이터 프록시씌운다음에 거기서 주입시키고,내부애들도 받는거넣으면될거같은데
+
+
+def rerollNamuData(db, cursor, logRes):
+    # 나무데이터 리셋
+    deleteData(db, cursor)
+
+    logDict = {}
     sql = """insert into  namu_data 
     (nd_one,nd_two,nd_three,nd_four,nd_five,nd_six,nd_seven,nd_eight,nd_nine,nd_ten,nd_kind)
     values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
     # 1시간 하루 이렇게 갯수세서 캐시에 넣기
-    for logindex, logdata in enumerate(logres):        
-        #현재로우 값 딕셔너리에 추가
-        logdic=dictMerge(logdic,sumRanking(logdata))
+    for logIndex, logData in enumerate(logRes):
+        # 현재로우 값 딕셔너리에 추가
+        logDict = dictMerge(logDict, sumRanking(logData))
 
-        # 카운트에 해당하는 숫자일때(하루,한시간,일주일..)
-        if logindex+1 in cc.count:
-            # 정렬해서 인서트할 값 생성          
-            logDataRes=namuDataCreate(logindex,logdic)
-            cursor.execute(sql, logDataRes)
+        # 카운트에 해당하는 숫자일때(하루,한시간,일주일..) 정렬해서 인서트할 값 생성
+        LogIncludeCount(cursor, sql, logIndex, logDict, cc.COUNT, cc.COUNTKIND)
+    # 완료후 커밋
     db.commit()
-    # rerollNamuData 분리,테스트코드작성,테스트코드 작성 편하게 분리하면될듯
-    # 바깥쪽for문, 안쪽for문이랑 if문 이렇게 분리하면될거같다
+
+# 이거 cc도 제거
+
+# 여기서부턴 목업필요
+
+
+def LogIncludeCount(cursor, sql, logIndex, logDict, count, countKind):
+    # 현재 로그인덱스값이 count에 있으면
+    if logIndex+1 in count:
+        # 정렬해서 인서트할 값 생성
+        logDataRes = namuDataCreate(logIndex, logDict, count, countKind)
+        cursor.execute(sql, logDataRes)
+        return True
+    else:
+        return False
 
 
 def sumRanking(data):
     resDict = {}
-    for countindex, itemdata in enumerate(data.items()):
-        if (itemdata[0] == 'na_time' or itemdata[0] == 'id'):
+
+    for countIndex, itemData in enumerate(data.items()):
+        if (itemData[0] == 'na_time' or itemData[0] == 'id'):
             continue  # 실제 값이 아니면 패스
-        # 해당 logdic에 값이 있으면 try,없으면 except
+        # 해당 logDict에 값이 있으면 try,없으면 except
         try:
-            resDict[itemdata[1]] += 11-countindex
+            resDict[itemData[1]] += 11-countIndex
         except:
-            resDict[itemdata[1]] = 11-countindex
+            resDict[itemData[1]] = 11-countIndex
     return resDict
 
-def namuDataCreate(countIndex,dic):
+# 전체dic를 정렬후 10개고르고 현재kind추가
+
+
+def namuDataCreate(countIndex, dic, count, countKind):
     # 정렬해서
-    sortdic = sorted(dic.items(), key=lambda x: x[1], reverse=True)
+    sortDict = sorted(dic.items(), key=lambda x: x[1], reverse=True)
     resArray = []
     # 상위10개 insert
-    for i in sortdic[:10]:
+    for i in sortDict[:10]:
         resArray += [i[0]]
     # 카운트종류(hour,day...) 추가
-    resArray += [cc.countkind[cc.count.index(countIndex+1)]]
+    resArray += [countKind[count.index(countIndex+1)]]
     return resArray
-            
 
-def dictMerge(firstDict,secondDict):
+
+def dictMerge(firstDict, secondDict):
     return dict(Counter(firstDict)+Counter(secondDict))
